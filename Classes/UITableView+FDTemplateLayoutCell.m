@@ -54,15 +54,28 @@
     CGFloat fittingHeight = 0;
     
     if (!cell.fd_enforceFrameLayout && contentViewWidth > 0) {
+        
+        // iOS 10.3在调用 systemLayoutSizeFittingSize会出现很多约束冲突导致高度计算错误
+        // workaround
+        // 1. 给contentView添加到cell的约束 2.添加widthFenceConstraint的时候用cell来添加而不是contentView
+        // 我们采用第二种方式来添加，之后有新解决方案再改掉
+        
         // Add a hard width constraint to make dynamic content views (like labels) expand vertically instead
         // of growing horizontally, in a flow-layout manner.
         NSLayoutConstraint *widthFenceConstraint = [NSLayoutConstraint constraintWithItem:cell.contentView attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:contentViewWidth];
-        [cell.contentView addConstraint:widthFenceConstraint];
+        if ([[UIDevice currentDevice].systemVersion floatValue] >= 10.3) {
+            [cell addConstraint:widthFenceConstraint];
+        }else {
+            [cell.contentView addConstraint:widthFenceConstraint];
+        }
         
         // Auto layout engine does its math
         fittingHeight = [cell.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
-        [cell.contentView removeConstraint:widthFenceConstraint];
-        
+        if ([[UIDevice currentDevice].systemVersion floatValue] >= 10.3) {
+            [cell removeConstraint:widthFenceConstraint];
+        }else {
+            [cell.contentView removeConstraint:widthFenceConstraint];
+        }
         [self fd_debugLog:[NSString stringWithFormat:@"calculate using system fitting size (AutoLayout) - %@", @(fittingHeight)]];
     }
     
