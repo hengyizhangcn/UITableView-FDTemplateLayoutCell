@@ -63,7 +63,8 @@
         // Add a hard width constraint to make dynamic content views (like labels) expand vertically instead
         // of growing horizontally, in a flow-layout manner.
         NSLayoutConstraint *widthFenceConstraint = [NSLayoutConstraint constraintWithItem:cell.contentView attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:contentViewWidth];
-        if ([[UIDevice currentDevice].systemVersion floatValue] >= 10.3) {
+        BOOL constraintsWillConflict = [[UIDevice currentDevice].systemVersion floatValue] >= 10.3;
+        if (constraintsWillConflict) {
             [cell addConstraint:widthFenceConstraint];
         }else {
             [cell.contentView addConstraint:widthFenceConstraint];
@@ -71,7 +72,7 @@
         
         // Auto layout engine does its math
         fittingHeight = [cell.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
-        if ([[UIDevice currentDevice].systemVersion floatValue] >= 10.3) {
+        if (constraintsWillConflict) {
             [cell removeConstraint:widthFenceConstraint];
         }else {
             [cell.contentView removeConstraint:widthFenceConstraint];
