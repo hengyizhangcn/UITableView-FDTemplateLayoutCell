@@ -62,21 +62,27 @@
         
         // Add a hard width constraint to make dynamic content views (like labels) expand vertically instead
         // of growing horizontally, in a flow-layout manner.
+        NSLayoutConstraint *top = [NSLayoutConstraint constraintWithItem:cell attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:cell.contentView attribute:NSLayoutAttributeTop multiplier:1.0 constant:0];
+        NSLayoutConstraint *left = [NSLayoutConstraint constraintWithItem:cell attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:cell.contentView attribute:NSLayoutAttributeLeft multiplier:1.0 constant:0];
+        NSLayoutConstraint *right = [NSLayoutConstraint constraintWithItem:cell attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationEqual toItem:cell.contentView attribute:NSLayoutAttributeRight multiplier:1.0 constant:0];
+        NSLayoutConstraint *bottom = [NSLayoutConstraint constraintWithItem:cell attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:cell.contentView attribute:NSLayoutAttributeBottom multiplier:1.0 constant:0];
+        [cell addConstraint:top];
+        [cell addConstraint:left];
+        [cell addConstraint:right];
+        [cell addConstraint:bottom];
+        
+        // Add a hard width constraint to make dynamic content views (like labels) expand vertically instead
+        // of growing horizontally, in a flow-layout manner.
         NSLayoutConstraint *widthFenceConstraint = [NSLayoutConstraint constraintWithItem:cell.contentView attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:contentViewWidth];
-        BOOL constraintsWillConflict = [[UIDevice currentDevice].systemVersion floatValue] >= 10.3;
-        if (constraintsWillConflict) {
-            [cell addConstraint:widthFenceConstraint];
-        }else {
-            [cell.contentView addConstraint:widthFenceConstraint];
-        }
+        [cell.contentView addConstraint:widthFenceConstraint];
         
         // Auto layout engine does its math
         fittingHeight = [cell.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
-        if (constraintsWillConflict) {
-            [cell removeConstraint:widthFenceConstraint];
-        }else {
-            [cell.contentView removeConstraint:widthFenceConstraint];
-        }
+        [cell.contentView removeConstraint:widthFenceConstraint];
+        [cell removeConstraint:top];
+        [cell removeConstraint:left];
+        [cell removeConstraint:right];
+        [cell removeConstraint:bottom];
         [self fd_debugLog:[NSString stringWithFormat:@"calculate using system fitting size (AutoLayout) - %@", @(fittingHeight)]];
     }
     
