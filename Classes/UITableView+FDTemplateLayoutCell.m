@@ -28,6 +28,9 @@
 - (CGFloat)fd_systemFittingHeightForConfiguratedCell:(UITableViewCell *)cell {
     CGFloat contentViewWidth = CGRectGetWidth(self.frame);
     
+    CGRect frame = cell.frame;
+    frame.size.width = contentViewWidth;
+    cell.frame = frame;
     // If a cell has accessory view or system accessory type, its content view's width is smaller
     // than cell's by some fixed values.
     if (cell.accessoryView) {
